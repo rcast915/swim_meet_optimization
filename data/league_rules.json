@@ -1,0 +1,23 @@
+{
+  "max_individual_events": 2,
+  "max_relay_events": 2,
+  "max_total_events": 4,
+  "fatigue_coefficient": 1.04,
+  "scoring": {
+    "individual": [6, 4, 3, 2, 1, 0],
+    "relay": [8, 4, 2, 0]
+  },
+  "events": [
+    "200 Medley Relay",
+    "200 Freestyle",
+    "200 IM",
+    "50 Freestyle",
+    "100 Butterfly",
+    "100 Freestyle",
+    "500 Freestyle",
+    "200 Freestyle Relay",
+    "100 Backstroke",
+    "100 Breaststroke",
+    "400 Freestyle Relay"
+  ]
+}
