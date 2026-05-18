@@ -22,9 +22,9 @@ def solve(swimmers: list[Swimmer], schedule: MeetSchedule, rules: dict) -> dict[
     # x[i][e] = 1 if swimmer i is assigned to event e
     x = [[model.NewBoolVar(f"x_{i}_{e}") for e in range(n_events)] for i in range(n_swimmers)]
 
-    # Each event must be filled (one swimmer for individual, four for relay)
+    # Fill each event if eligible swimmers exist; skip if no one qualifies
     for e, event in enumerate(schedule.events):
-        model.Add(sum(x[i][e] for i in range(n_swimmers)) == event.slots)
+        model.Add(sum(x[i][e] for i in range(n_swimmers)) <= event.slots)
 
     # Per-swimmer event limits
     indiv_events = [e for e, ev in enumerate(schedule.events) if not ev.is_relay]
@@ -55,9 +55,8 @@ def solve(swimmers: list[Swimmer], schedule: MeetSchedule, rules: dict) -> dict[
     if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
         raise RuntimeError("OR-Tools could not find a feasible solution.")
 
-    result: dict[str, list[str]] = {}
+    result: dict[tuple[str, str, str], list[str]] = {}
     for e, event in enumerate(schedule.events):
-        result[event.event_id] = [
-            swimmers[i].name for i in range(n_swimmers) if solver.Value(x[i][e])
-        ]
+        key = (event.age_group, event.gender, event.event_id)
+        result[key] = [swimmers[i].name for i in range(n_swimmers) if solver.Value(x[i][e])]
     return result

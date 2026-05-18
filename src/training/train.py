@@ -13,25 +13,34 @@ from src.data.pipeline import DataPipeline
 
 RULES_PATH = Path("data/league_rules.json")
 ROSTER_PATH = Path("data/raw/roster.csv")
+OPPONENT_PATH = Path("data/raw/opponent_times.csv")
 MODEL_PATH = Path("models/policy.zip")
 
 
-def make_env(rules: dict, roster_csv: str) -> SwimMeetEnv:
+def build_schedule(rules: dict, opponent_projections: dict) -> MeetSchedule:
+    individual_scoring = rules["scoring"]["individual"]
+    events = []
+    for age_group, event_ids in rules["individual_events_by_age_group"].items():
+        for gender in ("F", "M"):
+            for event_id in event_ids:
+                events.append(MeetEvent(
+                    event_id=event_id,
+                    age_group=age_group,
+                    gender=gender,
+                    is_relay=False,
+                    slots=1,
+                    scoring_table=individual_scoring,
+                ))
+    return MeetSchedule(events=events, opponent_projections=opponent_projections)
+
+
+def make_env(rules: dict) -> SwimMeetEnv:
     pipeline = DataPipeline(rules)
-    df = pipeline.load(roster_csv)
+    df = pipeline.load(str(ROSTER_PATH))
     df = pipeline.impute_missing_times(df)
     swimmers = pipeline.build_roster(df)
-
-    events = [
-        MeetEvent(
-            event_id=e,
-            is_relay="relay" in e.lower(),
-            slots=4 if "relay" in e.lower() else 1,
-            scoring_table=rules["scoring"]["relay" if "relay" in e.lower() else "individual"],
-        )
-        for e in rules["events"]
-    ]
-    schedule = MeetSchedule(events=events)
+    opponent_projections = pipeline.load_opponent_times(str(OPPONENT_PATH))
+    schedule = build_schedule(rules, opponent_projections)
     return SwimMeetEnv(Roster(swimmers), schedule)
 
 
@@ -41,17 +50,18 @@ def mask_fn(env: SwimMeetEnv):
 
 def train(total_timesteps: int = 500_000):
     rules = json.loads(RULES_PATH.read_text())
-    env = ActionMasker(make_env(rules, str(ROSTER_PATH)), mask_fn)
+    env = ActionMasker(make_env(rules), mask_fn)
 
     model = MaskablePPO("MultiInputPolicy", env, verbose=1)
     model.learn(total_timesteps=total_timesteps)
+    MODEL_PATH.parent.mkdir(exist_ok=True)
     model.save(MODEL_PATH)
     print(f"Saved policy to {MODEL_PATH}")
 
 
 def infer(model_path: str):
     rules = json.loads(RULES_PATH.read_text())
-    env = ActionMasker(make_env(rules, str(ROSTER_PATH)), mask_fn)
+    env = ActionMasker(make_env(rules), mask_fn)
 
     model = MaskablePPO.load(model_path, env=env)
     obs, _ = env.reset()
