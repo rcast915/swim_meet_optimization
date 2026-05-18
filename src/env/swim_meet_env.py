@@ -55,7 +55,7 @@ class SwimMeetEnv(gym.Env):
         events_since = self.roster.events_since_last(action, self.current_event_idx)
         swimmer = self.roster.swimmers[action]
         swimmer_time = swimmer.calculate_decayed_time(event.event_id, events_since)
-        opponent_time = self.schedule.sample_opponent_time(event.event_id, self.rng)
+        opponent_time = self.schedule.sample_opponent_time(event, self.rng)
 
         points = self._score_event(swimmer_time, opponent_time, event.scoring_table)
         self._total_points += points
@@ -70,7 +70,7 @@ class SwimMeetEnv(gym.Env):
 
     def action_masks(self) -> np.ndarray:
         event = self.schedule[self.current_event_idx]
-        return self.roster.action_mask(event.is_relay)
+        return self.roster.action_mask(event)
 
     def _obs(self) -> dict:
         return {

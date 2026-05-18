@@ -1,23 +1,32 @@
 {
+  "league": "Gus & Goldie Summer Swim League - Public Division",
+  "pool_course": "short_course_yards",
   "max_individual_events": 2,
   "max_relay_events": 2,
   "max_total_events": 4,
   "fatigue_coefficient": 1.04,
+  "teams": ["HAW-ZZ", "COW", "VETS-ZZ", "MEM-ZZ", "LCMP"],
+  "age_groups": ["6U", "7-8", "9-10", "11-12", "13-14", "15-18"],
+  "individual_events_by_age_group": {
+    "6U":   ["25_butterfly", "25_backstroke", "25_freestyle", "25_breaststroke"],
+    "7-8":  ["25_butterfly", "25_backstroke", "25_freestyle", "25_breaststroke"],
+    "9-10": ["25_butterfly", "25_backstroke", "25_freestyle", "25_breaststroke", "100_im"],
+    "11-12": ["50_butterfly", "50_backstroke", "50_freestyle", "50_breaststroke", "100_im"],
+    "13-14": ["50_butterfly", "50_backstroke", "50_freestyle", "50_breaststroke", "100_im"],
+    "15-18": ["50_butterfly", "50_backstroke", "50_freestyle", "50_breaststroke", "100_im"]
+  },
+  "relay_events": [
+    "100_freestyle_relay",
+    "100_medley_relay",
+    "200_freestyle_relay",
+    "200_medley_relay"
+  ],
   "scoring": {
     "individual": [6, 4, 3, 2, 1, 0],
     "relay": [8, 4, 2, 0]
   },
-  "events": [
-    "200 Medley Relay",
-    "200 Freestyle",
-    "200 IM",
-    "50 Freestyle",
-    "100 Butterfly",
-    "100 Freestyle",
-    "500 Freestyle",
-    "200 Freestyle Relay",
-    "100 Backstroke",
-    "100 Breaststroke",
-    "400 Freestyle Relay"
-  ]
+  "championship": {
+    "format": "prelim_final",
+    "qualifiers_per_event": 16
+  }
 }

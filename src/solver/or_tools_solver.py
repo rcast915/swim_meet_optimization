@@ -27,21 +27,22 @@ def solve(swimmers: list[Swimmer], schedule: MeetSchedule, rules: dict) -> dict[
         model.Add(sum(x[i][e] for i in range(n_swimmers)) == event.slots)
 
     # Per-swimmer event limits
+    indiv_events = [e for e, ev in enumerate(schedule.events) if not ev.is_relay]
+    relay_events = [e for e, ev in enumerate(schedule.events) if ev.is_relay]
     for i in range(n_swimmers):
         model.Add(sum(x[i][e] for e in range(n_events)) <= max_total)
-        indiv_events = [e for e, ev in enumerate(schedule.events) if not ev.is_relay]
-        relay_events = [e for e, ev in enumerate(schedule.events) if ev.is_relay]
         model.Add(sum(x[i][e] for e in indiv_events) <= max_individual)
         model.Add(sum(x[i][e] for e in relay_events) <= max_relay)
 
-    # Maximize expected points: use best_time as proxy (lower time = higher chance of winning)
-    # Scale times to integers for CP-SAT (multiply by 100, invert so lower time = higher score)
+    # Eligibility: swimmer must match the event's age_group and gender, and have a time
     objective_terms = []
     for i, swimmer in enumerate(swimmers):
         for e, event in enumerate(schedule.events):
+            wrong_bracket = (swimmer.age_group != event.age_group or swimmer.gender != event.gender)
             raw_time = swimmer.best_times.get(event.event_id)
-            if raw_time is None:
-                model.Add(x[i][e] == 0)  # can't assign if no time
+
+            if wrong_bracket or raw_time is None:
+                model.Add(x[i][e] == 0)
             else:
                 inverted_score = int(10000 - raw_time * 100)
                 objective_terms.append(inverted_score * x[i][e])

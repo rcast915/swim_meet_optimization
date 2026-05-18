@@ -1,5 +1,6 @@
 import numpy as np
 from src.models.swimmer import Swimmer
+from src.models.meet_schedule import MeetEvent
 
 
 class Roster:
@@ -7,12 +8,17 @@ class Roster:
         self.swimmers = swimmers
         self._last_event_idx: dict[str, int] = {s.name: -999 for s in swimmers}
 
-    def get_eligible_swimmers(self, is_relay: bool) -> list[int]:
-        return [i for i, s in enumerate(self.swimmers) if s.is_eligible(is_relay)]
+    def get_eligible_swimmers(self, event: MeetEvent) -> list[int]:
+        return [
+            i for i, s in enumerate(self.swimmers)
+            if s.is_eligible(event.is_relay)
+            and s.age_group == event.age_group
+            and s.gender == event.gender
+        ]
 
-    def action_mask(self, is_relay: bool) -> np.ndarray:
+    def action_mask(self, event: MeetEvent) -> np.ndarray:
         mask = np.zeros(len(self.swimmers), dtype=bool)
-        for i in self.get_eligible_swimmers(is_relay):
+        for i in self.get_eligible_swimmers(event):
             mask[i] = True
         return mask
 

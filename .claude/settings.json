@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/raycast/anaconda3/bin/python -m src.data.heat_sheet_parser \"data/Public Championship Finals Heat Sheet.pdf\")",
+      "Bash(/Users/raycast/anaconda3/bin/pip install *)",
+      "Bash(/Users/raycast/anaconda3/bin/python -c \"import pdfplumber; print\\('ok'\\)\")",
+      "Bash(/Users/raycast/anaconda3/bin/python -)",
+      "Bash(tesseract --version)"
+    ]
+  }
+}

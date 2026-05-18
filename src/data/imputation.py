@@ -5,25 +5,25 @@ from sklearn.linear_model import LinearRegression
 
 class StrokeProfileImputer:
     """
-    Extrapolates missing event times using linear regression against known events.
-
-    Example: predict 200 IM from 100 Breaststroke + 100 Butterfly splits.
-    Each target event gets its own regression model fit on athletes who have
-    all required values.
+    Fills missing event times using linear regression against a known event in the same distance group.
+    Only imputes within the correct distance tier (25-yard vs 50-yard) so young swimmers
+    never get 50-yard times predicted and vice versa.
     """
 
-    # Maps target event -> predictor events used for regression
     PREDICTOR_MAP: dict[str, list[str]] = {
-        "200_im": ["100_butterfly", "100_breaststroke"],
-        "500_freestyle": ["200_freestyle", "100_freestyle"],
-        "200_freestyle": ["100_freestyle", "50_freestyle"],
-        "100_butterfly": ["50_freestyle", "100_freestyle"],
-        "100_backstroke": ["50_freestyle", "100_freestyle"],
-        "100_breaststroke": ["50_freestyle", "100_freestyle"],
+        # 25-yard events (6U, 7-8, 9-10)
+        "25_butterfly":    ["25_freestyle"],
+        "25_backstroke":   ["25_freestyle"],
+        "25_breaststroke": ["25_freestyle"],
+        # 50-yard events (11-12, 13-14, 15-18)
+        "50_butterfly":    ["50_freestyle"],
+        "50_backstroke":   ["50_freestyle"],
+        "50_breaststroke": ["50_freestyle"],
+        "100_im":          ["50_freestyle"],
     }
 
     def __init__(self):
-        self._models: dict[str, LinearRegression] = {}
+        self._models: dict[str, tuple] = {}
 
     def fit(self, df: pd.DataFrame) -> "StrokeProfileImputer":
         for target, predictors in self.PREDICTOR_MAP.items():
