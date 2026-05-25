@@ -1,9 +1,6 @@
 # Ray's Project Plan — Swim Meet Optimizer
 
-I'm building a system that optimizes swim meet lineups for HAW-ZZ (Hawkins) in the
-El Paso Gus & Goldie Summer Swim League. The idea is to frame lineup assignment as a
-sequential decision problem and solve it two ways: a deterministic CP-SAT solver for
-a provably optimal baseline, and an RL agent that can handle stochastic opponent
+The idea is to frame lineup assignment as a sequential decision problem and solve it two ways: a deterministic CP-SAT solver for a provably optimal baseline, and an RL agent that can handle stochastic opponent
 strategy and swimmer fatigue.
 
 Naomi is handling the data and models layer. My work depends on her finishing first —
@@ -14,8 +11,6 @@ before I start the solver.
 
 ## What I Need to Understand First
 
-- [ ] Read the design doc — understand the full scope before writing anything
-- [ ] Read `data/league_rules.json` — internalize the age group / event / scoring structure
 - [ ] Be able to answer: why does greedy fail here? Why do we need two solvers?
 - [ ] Nail down the MDP formulation — what is the state, action, and reward for this problem?
 - [ ] Understand why terminal reward makes more sense than per-step reward here
@@ -114,8 +109,8 @@ I want to know whether the RL agent actually adds value over the deterministic b
 
 ## Phase 5 — Real Data (coordinate with Naomi)
 
-- [ ] Get real HAW-ZZ roster from coach — swap out `data/raw/roster.csv`
-- [ ] Get real meet history (request `.hyv`/`.hy3` from meet director, or manual entry)
+- [ ] Get real roster from Naomi and Victoria — swap out `data/raw/roster.csv`
+- [ ] Get real meet history (request `.hyv`/`.hy3` from Martin)
       and build a proper `data/raw/opponent_times.csv` from it
 - [ ] Re-run everything on real data and sanity-check results against actual knowledge of the team
 
@@ -127,3 +122,4 @@ I want to know whether the RL agent actually adds value over the deterministic b
 - **Do not use base Anaconda Python** — NumPy version conflicts break pandas and sklearn there
 - **All current data is dummy** — don't tune thresholds or hyperparameters against it
 - **Naomi's deliverables I depend on:** `Swimmer`, `MeetEvent`, `MeetSchedule`, `Roster`, `DataPipeline`
+- **Interface note:** `opponent_projections` is `dict[(age_group, gender, event_id), (mean, std)]` — Gaussian parameters fitted from historical times, not raw lists. `sample_opponent_time` calls `rng.normal(mean, std)` clamped to min 1.0.

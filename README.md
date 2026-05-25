@@ -3,7 +3,7 @@
 
 Automated, data-driven system for optimizing competitive swim meet lineups using reinforcement learning and deterministic constraint solving. Treats lineup assignment as a sequential decision-making problem to maximize total team points under city league constraints.
 
-Built for **HAW-ZZ (Hawkins)** competing in the **El Paso Gus & Goldie Summer Swim League, Public Division**.
+Built for **Hawkins** competing in the **El Paso Gus & Goldie Summer Swim League, Public Division**.
 
 ---
 
@@ -83,8 +83,10 @@ swim_rl/
 │   │   └── swim_meet_env.py        # SwimMeetEnv (Gymnasium) + action_masks()
 │   ├── solver/
 │   │   └── or_tools_solver.py      # CP-SAT deterministic baseline
-│   └── training/
-│       └── train.py                # build_schedule, make_env, MaskablePPO train + infer
+│   ├── training/
+│   │   └── train.py                # build_schedule, make_env, MaskablePPO train + infer
+│   └── gui/
+│       └── app.py                  # Streamlit app — roster upload, solver selection, lineup display
 ├── models/                         # Saved policy weights (.zip)
 ├── notebooks/
 └── requirements.txt
@@ -153,6 +155,7 @@ Scoring: individual [6, 4, 3, 2, 1, 0] — relay [8, 4, 2, 0].
 - **Phase 3** — Gymnasium environment (Ray): `SwimMeetEnv` with action masking, verified with random rollouts
 - **Phase 4** — RL training (Ray): MaskablePPO trained and benchmarked against OR-Tools baseline
 - **Phase 5** — Real data: replace dummy CSVs with actual HAW-ZZ roster and meet history
+- **Phase 6** — GUI (Naomi): Streamlit app — roster upload, solver selection, lineup display
 
 ---
 
